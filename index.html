@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER FORCE // כיתה טיפולית — ספר מחזור</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2304070a'/%3E%3Crect x='3' y='3' width='58' height='58' rx='7' fill='none' stroke='%2300ff9c' stroke-width='3'/%3E%3Cpath d='M9 9h10M9 9v10M55 9h-10M55 9v10M9 55h10M9 55v-10M55 55h-10M55 55v-10' stroke='%2300ff9c' stroke-width='3' stroke-linecap='round'/%3E%3Ctext x='32' y='43' font-family='monospace' font-size='30' font-weight='700' fill='%2300ff9c' text-anchor='middle'%3E%26gt;_%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Karantina:wght@300;400;700&family=Heebo:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04070a;
+  --bg2:#080d12;
+  --panel:#0a1218;
+  --line:#12303a;
+  --green:#00ff9c;
+  --green-dim:#00c878;
+  --cyan:#39d0ff;
+  --amber:#ffb454;
+  --red:#ff4d6d;
+  --text:#c9e8d9;
+  --muted:#5f8a78;
+  --mono:'IBM Plex Mono',monospace;
+  --display:'Karantina',cursive;
+  --body:'Heebo',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+::selection{background:var(--green);color:#03110a}
+
+/* ---------- CRT overlay ---------- */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9000;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);
+  mix-blend-mode:overlay;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9001;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+
+/* ---------- Matrix canvas ---------- */
+#matrix{position:fixed;inset:0;z-index:0;opacity:.14;pointer-events:none}
+
+/* ---------- Boot screen ---------- */
+#boot{
+  position:fixed;inset:0;z-index:9999;background:#020403;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s ease;cursor:pointer;
+}
+#boot.done{opacity:0;pointer-events:none}
+#bootlog{
+  font-family:var(--mono);font-size:clamp(11px,1.6vw,15px);
+  color:var(--green);direction:ltr;text-align:left;
+  width:min(560px,90vw);white-space:pre-wrap;line-height:1.7;
+  text-shadow:0 0 8px rgba(0,255,156,.5);
+}
+#bootlog .ok{color:var(--cyan)}
+#bootlog .warn{color:var(--amber)}
+.cursor{display:inline-block;width:.6em;height:1.1em;background:var(--green);vertical-align:text-bottom;animation:blink .8s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- Header / hero ---------- */
+header{
+  position:relative;z-index:2;
+  padding:clamp(48px,9vh,110px) 24px 40px;
+  text-align:center;
+}
+.tagline-top{
+  font-family:var(--mono);font-size:12px;letter-spacing:.5em;
+  color:var(--muted);text-transform:uppercase;direction:ltr;
+  margin-bottom:18px;
+}
+.tagline-top b{color:var(--red);animation:blink 1.6s steps(1) infinite}
+h1.glitch{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(72px,15vw,190px);
+  line-height:.85;letter-spacing:.02em;
+  color:var(--green);
+  text-shadow:0 0 30px rgba(0,255,156,.35),0 0 90px rgba(0,255,156,.15);
+  position:relative;display:inline-block;direction:ltr;
+}
+h1.glitch::before,h1.glitch::after{
+  content:attr(data-text);position:absolute;inset:0;overflow:hidden;
+}
+h1.glitch::before{color:var(--cyan);z-index:-1;animation:gl1 3.2s infinite steps(2)}
+h1.glitch::after{color:var(--red);z-index:-2;animation:gl2 2.7s infinite steps(2)}
+@keyframes gl1{
+  0%,92%,100%{transform:none;clip-path:inset(0)}
+  93%{transform:translate(-5px,2px);clip-path:inset(10% 0 55% 0)}
+  95%{transform:translate(4px,-2px);clip-path:inset(60% 0 5% 0)}
+  97%{transform:translate(-3px,1px);clip-path:inset(30% 0 40% 0)}
+}
+@keyframes gl2{
+  0%,88%,100%{transform:none;clip-path:inset(0)}
+  89%{transform:translate(5px,1px);clip-path:inset(45% 0 20% 0)}
+  92%{transform:translate(-4px,-2px);clip-path:inset(5% 0 75% 0)}
+  95%{transform:translate(3px,2px);clip-path:inset(70% 0 8% 0)}
+}
+.sub-he{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(34px,6vw,72px);color:var(--text);
+  margin-top:10px;letter-spacing:.03em;
+}
+.sub-he em{font-style:normal;color:var(--amber)}
+.hero-line{
+  font-family:var(--mono);font-size:clamp(11px,1.5vw,14px);
+  color:var(--muted);margin-top:22px;direction:ltr;
+}
+.hero-line span{color:var(--green)}
+
+/* stats strip */
+.stats{
+  position:relative;z-index:2;
+  display:flex;justify-content:center;gap:0;
+  flex-wrap:wrap;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin:44px auto 0;max-width:1100px;
+  background:linear-gradient(180deg,rgba(0,255,156,.03),transparent);
+}
+.stat{
+  flex:1 1 160px;padding:18px 10px;text-align:center;
+  border-inline-start:1px solid var(--line);
+}
+.stat:first-child{border-inline-start:none}
+.stat .num{
+  font-family:var(--display);font-size:46px;font-weight:700;
+  color:var(--green);line-height:1;text-shadow:0 0 18px rgba(0,255,156,.4);
+}
+.stat .lbl{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.15em;margin-top:4px}
+
+/* ---------- Toolbar ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(4,7,10,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:14px clamp(16px,4vw,48px);
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+}
+.toolbar .prompt{font-family:var(--mono);color:var(--green);font-size:14px;direction:ltr;white-space:nowrap}
+#search{
+  flex:1;min-width:200px;
+  background:var(--panel);border:1px solid var(--line);
+  color:var(--text);font-family:var(--body);font-size:16px;
+  padding:10px 16px;border-radius:2px;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+#search:focus{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 20px rgba(0,255,156,.15)}
+#search::placeholder{color:var(--muted)}
+#count{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+#shuffle{
+  background:transparent;border:1px solid var(--line);color:var(--cyan);
+  font-family:var(--mono);font-size:12px;padding:10px 16px;cursor:pointer;
+  border-radius:2px;letter-spacing:.1em;transition:.2s;
+}
+#shuffle:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(57,208,255,.25);background:rgba(57,208,255,.06)}
+
+/* ---------- Grid ---------- */
+main{position:relative;z-index:2;max-width:1440px;margin:0 auto;padding:40px clamp(16px,4vw,48px) 80px}
+.grid{
+  display:grid;gap:26px;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+}
+.card{
+  position:relative;background:var(--panel);
+  border:1px solid var(--line);
+  cursor:pointer;overflow:hidden;
+  opacity:0;transform:translateY(26px);
+  animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards;
+  animation-delay:calc(var(--i)*55ms);
+  transition:border-color .25s,box-shadow .25s,transform .25s;
+}
+@keyframes rise{to{opacity:1;transform:none}}
+.card:hover{
+  border-color:var(--green);
+  box-shadow:0 0 0 1px var(--green),0 18px 50px -12px rgba(0,255,156,.25);
+  transform:translateY(-5px);
+}
+.card.hidden{display:none}
+/* corner brackets */
+.card::before,.card::after,
+.card .cb1,.card .cb2{
+  content:"";position:absolute;width:14px;height:14px;z-index:5;
+  border-color:var(--green);border-style:solid;opacity:0;transition:opacity .25s;
+}
+.card::before{top:6px;right:6px;border-width:2px 2px 0 0}
+.card::after{top:6px;left:6px;border-width:2px 0 0 2px}
+.card .cb1{bottom:6px;right:6px;border-width:0 2px 2px 0}
+.card .cb2{bottom:6px;left:6px;border-width:0 0 2px 2px}
+.card:hover::before,.card:hover::after,
+.card:hover .cb1,.card:hover .cb2{opacity:1}
+
+.photo{
+  position:relative;aspect-ratio:1/1.05;overflow:hidden;
+  border-bottom:1px solid var(--line);
+  background:#000;
+}
+.photo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:grayscale(.85) contrast(1.08) brightness(.92);
+  transition:filter .45s ease,transform .45s ease;
+}
+.card:hover .photo img{filter:none;transform:scale(1.045)}
+.photo::after{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,255,156,.05) 0 1px,transparent 1px 4px),
+             linear-gradient(180deg,transparent 60%,rgba(4,7,10,.85));
+  pointer-events:none;
+}
+/* scan sweep */
+.photo .scan{
+  position:absolute;left:0;right:0;height:34%;top:-40%;
+  background:linear-gradient(180deg,transparent,rgba(0,255,156,.16),transparent);
+  border-bottom:1px solid rgba(0,255,156,.5);
+  opacity:0;pointer-events:none;
+}
+.card:hover .photo .scan{opacity:1;animation:sweep 1.4s ease-in-out infinite}
+@keyframes sweep{0%{top:-40%}100%{top:110%}}
+
+.badge-id{
+  position:absolute;top:10px;inset-inline-start:10px;z-index:6;
+  font-family:var(--mono);font-size:10px;letter-spacing:.15em;
+  color:var(--green);background:rgba(4,7,10,.8);
+  border:1px solid rgba(0,255,156,.4);
+  padding:3px 8px;direction:ltr;
+}
+.badge-clr{
+  position:absolute;top:10px;inset-inline-end:10px;z-index:6;
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;
+  color:var(--amber);border:1px solid rgba(255,180,84,.45);
+  background:rgba(4,7,10,.8);padding:3px 7px;direction:ltr;
+}
+.meta{padding:16px 18px 18px}
+.codename{
+  font-family:var(--body);font-weight:900;font-size:17px;
+  color:var(--cyan);letter-spacing:.04em;margin-bottom:6px;
+  text-shadow:0 0 14px rgba(57,208,255,.55);
+  display:inline-block;
+  border:1px solid rgba(57,208,255,.45);
+  background:rgba(57,208,255,.08);
+  padding:3px 10px;border-radius:2px;
+}
+.codename::before{content:"// ";font-family:var(--mono);opacity:.7}
+.name{
+  font-family:var(--display);font-weight:700;font-size:34px;line-height:1;
+  color:var(--text);transition:color .2s,text-shadow .2s;
+}
+.card:hover .name{color:var(--green);text-shadow:0 0 16px rgba(0,255,156,.45)}
+.desc{
+  font-size:13.5px;line-height:1.65;color:var(--muted);
+  margin-top:10px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.open-hint{
+  font-family:var(--mono);font-size:10px;color:var(--green-dim);
+  margin-top:12px;letter-spacing:.15em;opacity:0;transform:translateX(6px);
+  transition:.25s;direction:ltr;text-align:left;
+}
+.card:hover .open-hint{opacity:1;transform:none}
+
+.noresults{
+  grid-column:1/-1;text-align:center;padding:70px 20px;
+  font-family:var(--mono);color:var(--red);font-size:14px;letter-spacing:.1em;
+  border:1px dashed var(--line);
+}
+
+/* ---------- Dossier modal ---------- */
+#overlay{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(2,4,6,.82);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+  padding:20px;
+}
+#overlay.open{opacity:1;pointer-events:auto}
+#dossier{
+  position:relative;width:min(880px,96vw);max-height:92vh;overflow-y:auto;
+  background:var(--bg2);border:1px solid var(--green);
+  box-shadow:0 0 0 1px rgba(0,255,156,.2),0 0 80px rgba(0,255,156,.18);
+  transform:translateY(24px) scale(.97);transition:transform .3s cubic-bezier(.2,.7,.2,1);
+}
+#overlay.open #dossier{transform:none}
+.d-top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 18px;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  letter-spacing:.15em;direction:ltr;
+  background:linear-gradient(90deg,rgba(0,255,156,.06),transparent);
+  position:sticky;top:0;background-color:var(--bg2);z-index:3;
+}
+.d-top .dot{color:var(--red)}
+#close{
+  background:none;border:1px solid var(--line);color:var(--red);
+  font-family:var(--mono);cursor:pointer;padding:4px 12px;font-size:12px;
+  transition:.2s;
+}
+#close:hover{border-color:var(--red);box-shadow:0 0 12px rgba(255,77,109,.35)}
+.d-body{display:grid;grid-template-columns:300px 1fr;gap:0}
+@media(max-width:680px){.d-body{grid-template-columns:1fr}}
+.d-photo{position:relative;border-inline-end:1px solid var(--line);background:#000}
+.d-photo img{width:100%;height:100%;object-fit:cover;display:block;min-height:300px;filter:contrast(1.05)}
+.d-photo::after{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,255,156,.06) 0 1px,transparent 1px 4px);
+  pointer-events:none;
+}
+.stamp{
+  position:absolute;bottom:14px;inset-inline-start:12px;
+  font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red);
+  border:2px solid var(--red);padding:4px 12px;letter-spacing:.3em;
+  transform:rotate(-8deg);opacity:.85;direction:ltr;
+  background:rgba(2,4,6,.55);
+}
+.d-info{padding:26px 30px 30px}
+.d-id{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.2em;direction:ltr;text-align:left}
+.d-name{font-family:var(--display);font-weight:700;font-size:clamp(44px,7vw,64px);color:var(--green);line-height:1;margin:8px 0 2px;text-shadow:0 0 24px rgba(0,255,156,.35)}
+.d-code{
+  font-family:var(--body);font-weight:900;font-size:22px;
+  color:var(--cyan);letter-spacing:.03em;margin-bottom:18px;
+  text-shadow:0 0 18px rgba(57,208,255,.6);
+  display:inline-block;border:1px solid rgba(57,208,255,.45);
+  background:rgba(57,208,255,.08);padding:4px 14px;border-radius:2px;
+}
+.d-code::before{content:"// ";font-family:var(--mono);opacity:.7}
+.d-desc{
+  font-size:16px;line-height:1.9;color:var(--text);
+  border-inline-start:2px solid var(--green);padding-inline-start:16px;
+  margin-bottom:26px;
+}
+.d-skills{display:flex;flex-direction:column;gap:12px}
+.skill{display:grid;grid-template-columns:120px 1fr 42px;align-items:center;gap:12px}
+.skill .sl{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em}
+.skill .bar{height:6px;background:rgba(255,255,255,.05);border:1px solid var(--line);position:relative;overflow:hidden}
+.skill .fill{
+  position:absolute;inset-block:0;inset-inline-start:0;width:0;
+  background:linear-gradient(90deg,var(--green-dim),var(--green));
+  box-shadow:0 0 10px rgba(0,255,156,.5);
+  transition:width .9s cubic-bezier(.2,.7,.2,1);
+}
+.skill .sv{font-family:var(--mono);font-size:11px;color:var(--green);direction:ltr;text-align:right}
+.d-nav{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:14px 18px;border-top:1px solid var(--line);
+}
+.d-nav button{
+  background:transparent;border:1px solid var(--line);color:var(--text);
+  font-family:var(--body);font-size:14px;padding:9px 20px;cursor:pointer;transition:.2s;
+}
+.d-nav button:hover{border-color:var(--green);color:var(--green);box-shadow:0 0 12px rgba(0,255,156,.2)}
+
+/* ---------- Footer ---------- */
+footer{
+  position:relative;z-index:2;text-align:center;
+  padding:50px 20px 70px;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,transparent,rgba(0,255,156,.03));
+}
+footer .big{font-family:var(--display);font-size:clamp(38px,6vw,64px);font-weight:700;color:var(--text)}
+footer .big span{color:var(--green)}
+footer .small{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:12px;letter-spacing:.2em;direction:ltr}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+  #matrix{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<!-- boot screen -->
+<div id="boot"><pre id="bootlog"></pre></div>
+
+<header>
+  <div class="tagline-top">TOP SECRET // EYES ONLY <b>&#9679; REC</b></div>
+  <h1 class="glitch" data-text="CYBER FORCE">CYBER FORCE</h1>
+  <div class="sub-he">ספר מחזור — <em>כיתה טיפולית</em></div>
+  <div class="hero-line">&gt; unit_status: <span>OPERATIONAL</span> | clearance: <span>LEVEL-9</span> | year: <span>2026</span></div>
+
+  <div class="stats">
+    <div class="stat"><div class="num" data-count="33">0</div><div class="lbl">סוכנים פעילים</div></div>
+    <div class="stat"><div class="num" data-count="9000">0</div><div class="lbl">כוסות קפה</div></div>
+    <div class="stat"><div class="num" data-count="404">0</div><div class="lbl">תירוצים שנמצאו</div></div>
+    <div class="stat"><div class="num" data-count="0">0</div><div class="lbl">תקריות (רשמית)</div></div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <span class="prompt">root@cyberforce:~$ grep</span>
+  <input id="search" type="text" placeholder="חיפוש סוכן לפי שם או כינוי…" autocomplete="off">
+  <span id="count"></span>
+  <button id="shuffle">SHUFFLE()</button>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- dossier modal -->
+<div id="overlay">
+  <div id="dossier" role="dialog" aria-modal="true">
+    <div class="d-top">
+      <span><span class="dot">&#9679;</span> PERSONNEL FILE — DECRYPTED</span>
+      <button id="close">ESC [X]</button>
+    </div>
+    <div class="d-body">
+      <div class="d-photo"><img id="d-img" alt=""><div class="stamp">CLASSIFIED</div></div>
+      <div class="d-info">
+        <div class="d-id" id="d-id"></div>
+        <div class="d-name" id="d-name"></div>
+        <div class="d-code" id="d-code"></div>
+        <p class="d-desc" id="d-desc"></p>
+        <div class="d-skills" id="d-skills"></div>
+      </div>
+    </div>
+    <div class="d-nav">
+      <button id="prev">&#8594; הסוכן הקודם</button>
+      <button id="next">הסוכן הבא &#8592;</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="big">נתראה בגרסה <span>2.0</span> &#128640;</div>
+  <div class="small">CYBER FORCE YEARBOOK // COMPILED WITH ♥ AND CAFFEINE // 2026</div>
+</footer>
+
+<script>
+/* ================= DATA ================= */
+const AGENTS = [
+ {name:"שי פלד",title:"המתעד הביישן",desc:"הוא מסוגל לפענח שאילתות Elasticsearch סבוכות שאף אחד אחר לא מבין, אבל נכנס לפאניקה אם צריך לבקש תוספת חלב בקפה. המשאלה הכי גדולה שלו היא שמישהו ימציא בוט שיענה במקומו בסיסמאות 'מגניבות'.",image:"שי פלד.jpg"},
+ {name:"אברהם שוורץ",title:"הבוס המסתורי",desc:"הוא נראה לכם כמו מישהו שקורא דוחות מורכבים כל היום, אבל יש לכם חשד כבד שרוב הזמן הוא פשוט מנסה להבין איך להוסיף אמוג'י בפורמט PDF. המשימה המעשית היחידה שלו היא להגיש בקשה למכונת קפה חדשה, בטענה שזה קריטי ל'תפוקה הארגונית'.",image:"אברהם שוורץ.jpg"},
+ {name:"אופיר כהן",title:"הפורץ האלגנטי",desc:"הוא נראה יותר כמו דוגמן לתספורות מאשר האקר רציני. החיוך שלו אומר שהוא מוכן להשתמש בקסם אישי כדי לקבל את סיסמת ה-WiFi שלך. הוא כנראה מומחה להנדסה חברתית, שזה בעצם לפרוץ למערכת על ידי בקשה מנומסת. ה-AI שלו מתוכנת למצוא פגיעות רגשיות במקום חולשות אבטחה.",image:"אופיר כהן.jpg"},
+ {name:"אורטל ניב",title:"המפקדת המחויכת",desc:"היא מנהלת את היחידה כולה עם חיוך שרמנטי, אבל ה-AI שלה מדווח לה בדיוק מתי אתם משתמשים בעכבר כדי לפתוח כרטיסייה נוספת של חדשות. המטרה הבאה שלה היא לבנות אפליקציה שתתרגם אוטומטית 'כן' מנומס של מפתח ל-'אולי בעוד שנה'.",image:"אורטל ניב.jpg"},
+ {name:"אורי פלקסר",title:"שרברב הנתונים",desc:"הוא מהנדס דאטה אגדי שמסוגל לתכנן פייפליין של פטה-בייטים על מפית בפאב. הוא בטוח שמשקפי השמש שלו הם מסנני דאטה פסיביים שמונעים מנתונים גרועים להשפיע על המצב רוח שלו.",image:"אורי פלקסר.jpg"},
+ {name:"אורית אברהם",title:"האורקל",desc:"מוחה פועל כסורק תוכן מובנה, אבל כרגע הוא מתמקד במציאת הפילטר המושלם לתמונת הקפה שלה. היא אירגנה פעם מסיבת צוות לפי צבעים של טיפוסי אישיות, אבל גילתה שכולם פשוט רצו פיצה.",image:"אורית אברהם.jpg"},
+ {name:"אורית מלמד",title:"הסוכנת הסודית",desc:"החיוך התמים הזה מסתיר את הפיירוול החזק ביותר שראיתם מעולם. היא כנראה שומרת את ה-API keys בתוך נמש סודי, רק כדי להיות בטוחה.",image:"אורית מלמד.jpg"},
+ {name:"אייל אסרף",title:"שומר השתיקה",desc:"שיטת האבטחה המנצחת שלו מבוססת על הימנעות משיחות. במקום לתת לכם הרשאות למידע רגיש, הוא פשוט יחייך במבוכה וילך בשקט להחביא את השרתים.",image:"אייל אסרף.jpg"},
+ {name:"אייל רייס",title:"הקוסם המחייך",desc:"הוא נראה כמו השכן הנחמד שרק רוצה לעזור, אבל מאחורי החיוך מסתתרת מפלצת SQL שמפרקת צינורות נתונים. הוא יחליף לך כל באג בנתונים לפני שתשים לב, אבל אל תנסה לריב איתו על פריבילגיות גישה.",image:"אייל רייס.jpg"},
+ {name:"אייל רן",title:"הלוחש למודלים",desc:"החיוך הרגוע שלו מטעה, כי בתוך הראש הוא מריץ עליכם עכשיו רשת נוירונים כדי לחזות מתי תעזבו אותו בשקט. הוא כנראה ניסה לאמן מודל AI שיבחר עבורו בגדים בבוקר, אבל האלגוריתם הגיע למסקנה שחולצה שחורה היא האופטימום המוחלט.",image:"אייל רן.jpg"},
+ {name:"אלי רחמים",title:"הלוחש לנוכלים",desc:"הוא חושד שכל מי שאומר לו 'בוקר טוב' מנסה לעקוץ לו את הפנסיה, כולל מכונת הקפה במשרד. משקפי השמש נשארים מוכנים על הראש למקרה שיצטרך לרדת למחתרת כדי לתפוס נסיך ניגרי.",image:"אלי רחמים.jpg"},
+ {name:"אמיר כנען",title:"אדון הפייפליין",desc:"הוא בטוח שכל שאר הצוותים בחברה קיימים רק כדי לייצר נתונים שהוא מרשה להם להעביר. מסוגל לבנות ארכיטקטורת נתונים שלמה על מפית בזמן לגימת אספרסו, אבל קורס אם מבקשים ממנו לעדכן תיעוד.",image:"אמיר כנען.jpg"},
+ {name:"גיא דוידוביץ'",title:"קפטן דאטה",desc:"הוא תמיד ממצמץ למרחק כדי לאתר באגים בפייפליין הנתונים עוד לפני שהם בכלל נכתבו בקוד. משקפי השמש שעל ראשו הם בעצם אנטנה סודית שמשדרת פקודות לצוות שלו ולמודלי הבינה המלאכותית במקביל.",image:"גיא דוידוביץ'.jpg"},
+ {name:"גיא יחזקאל",title:"הכספת האנושית",desc:"המקש הרציני שלו הוא בעצם אתגר 'קאפצ'ה' אנושי להאקרים. החולצה השחורה שלו למעשה ארוגה בקוד סודי שקוטע מתקפות עוד לפני שהתחילו.",image:"גיא יחזקאל.jpg"},
+ {name:"גילי סבן",title:"המבקר השקט",desc:"עם הבעת פנים של מישהו שראה הכל, הוא מוצא פרצות אבטחה קריטיות בזמן שהוא שותה קפה בנחת. במקום להיכנס לפאניקה, הוא פשוט מסמן 'בוצע' על עוד פריצה מוצלחת וממשיך לסדר היום שלו.",image:"גילי סבן.jpg"},
+ {name:"גל מזרחי",title:"אלוף הצינורות",desc:"עם חיוך של מיליון ביט, הוא מסוגל לשכנע גם את בסיס הנתונים המבולגן ביותר להתנהג יפה. הוא כל כך חלק, שהצינורות שלו לא צריכים שמן כדי להעביר טרה-בייטים של דאטה.",image:"גל מזרחי.jpg"},
+ {name:"דיקלה שחף",title:"מהנדסת מנוחה",desc:"היא אולי נראית כאילו היא נהנית מהשקיעה, אבל בראש שלה היא כבר מתכננת את הארכיטקטורה לניקוי דאטה מכל הים הזה. בעוד שאחרים רואים שקיעה רומנטית, היא רואה מערך JSON עצום שאפשר לעשות עליו שאילתת SQL מתוחכמת כדי למצוא את הזווית המדויקת של קרני האור.",image:"דיקלה שחף.jpg"},
+ {name:"חזי בן עמי",title:"אוגר המידע",desc:"מאחורי החיוך התמים מסתתר אדם ששומר גיבוי מוצפן של כל פדיחה שאי פעם עשיתם ברשת של החברה. מבחינתו, רמת האבטחה האידיאלית למידע רגיש היא פשוט לנתק את השרתים מהחשמל ולבלוע את הכבל.",image:"חזי בן עמי.jpg"},
+ {name:"דניאל שלומניוק",title:"הפורץ המנומס",desc:"עם הטיית ראש תמימה וחיוך שובה לב, הוא נראה כמו בחור שרק רוצה להזמין אותך לקפה, אבל בפועל הוא כבר עקף לך את כל חומות האש. הוא יקריס לכם את מערך האבטחה של הארגון ללא מאמץ, ואז ישלח לכם הודעת התנצלות מנומסת עם אימוג'י של לב.",image:"דניאל שלומניוק.jpg"},
+ {name:"יניב דביר",title:"הרוח הדיגיטלית",desc:"מומחה בלא להשאיר עקבות. הסימן היחיד שהוא סיים מבדק חדירות בהצלחה הוא כשהעכבר שלכם מתחיל לזוז מעצמו וכותב: 'פרצתי לכם לשרת, השארתי עוגיות במטבח'.",image:"יניב דביר.JPG"},
+ {name:"כרמית שור פסי",title:"האסטרטגית המסתורית",desc:"היא נוכחת בכל ישיבה חשובה עם חיוך רחב, מהנהנת במבט מעמיק ורושמת הערות סודיות שאף אחד לא יראה לעולם. עד שתצליחו להבין מה היא בעצם עושה בחברה, היא כבר תסיים לכתוב אסטרטגיה להשתלטות על המחלקה שלכם.",image:"כרמית שור פסי.jpg"},
+ {name:"ליעד שריקי",title:"שומרת הסודות",desc:"היא אולי נראית בעיצומה של חופשה פסטורלית, אבל התיק הענק שלה מכיל את כל הדיסקים הקשיחים של החברה רק ליתר ביטחון. אם תעזו לבקש ממנה את הסיסמה לווייפיי של המלון, סביר להניח שתצטרכו לעבור פוליגרף קפדני ולחתום על ערימה של הסכמי סודיות.",image:"ליעד שריקי.jpg"},
+ {name:"מורן שגב",title:"המצפינה החייכנית",desc:"מאחורי המשקפיים התמימים והחיוך החם, מסתתרת תוכנת אנטי-וירוס אנושית שתחסום לכם את הגישה למחשב על כל קליק חשוד. היא נראית כאילו תביא לכם עוגיות טעימות למשרד, אבל בפועל תדרוש מכם להצפין את המתכון ולעבור אימות דו-שלבי לפני שתזכו לביס.",image:"מורן שגב.jpg"},
+ {name:"מריה אדריינקו",title:"מהנדסת השוקולד",desc:"מבחינתה, פיתוח צינורות נתונים זה בדיוק כמו למיין סוכריות - מעבירים הלאה רק את המידע שזורם חלק, ואת כל השאר פשוט זורקים לפח. כשהדאטה שלכם מתחיל לעשות בעיות או להיתקע, היא פשוט כולאת אותו מאחורי סורגים עם שומר מפלסטיק והולכת להצטלם בחיוך.",image:"מריה אדריינקו.jpg"},
+ {name:"ניב נתנאל",title:"האקר ההרים",desc:"הוא מטפס עד לפסגות קפואות ונידחות רק כדי למצוא מקום שקט לכתוב בו קוד מבלי שאף אחד יציץ לו במסך. כל עוד יש שם קליטה שמאפשרת לו לפרוץ לשרתים, ממש לא אכפת לו לאבד איזה רגל ממכת קור.",image:"ניב נתנאל.jpg"},
+ {name:"ספיר דגן",title:"הצוללן הכועס",desc:"הוא כל כך רותח מעצבים על כמות התראות השווא במערכת, שהוא פשוט התרסק לתוך שלולית בוץ עם ציוד צלילה מלא רק כדי לקרר את הראש. גם כשהוא שוכב עם הפנים בתוך המים העכורים, עדיין אפשר לשמוע אותו צועק מבעד לווסת על הלוגים שלא מתפרסרים כמו שצריך ב-ELK.",image:"ספיר דגן.jpg"},
+ {name:"עידן עזריה",title:"פילוסוף הדאטה",desc:"הוא נראה קשוח כמו שומר סף במועדון, אבל המבט החודר הזה בעצם מוקדש להרהורים על מאמר אקדמי חדש בנושא ניהול נתונים. מרוב שהוא נהנה לחקור כל טכנולוגיה אפשרית לעומק, עד שהוא סוף סוף מחליט איך לבנות את פייפליין הנתונים המושלם, כולם כבר עברו להשתמש במערכת אחרת.",image:"עידן עזריה.jpg"},
+ {name:"צחי לייכט",title:"הפורץ הבדרן",desc:"הוא הופך כל מבדק חדירות מלחיץ למופע סטנד-אפ קורע, וגורם לצוותי ההגנה בארגון לבכות מצחוק במקום מפאניקה. עד שתקלטו שהוא השתלט לכם על כל השרתים, תהיו עסוקים מדי בלצחוק מהבדיחות שלו מכדי לנתק את המערכת מהחשמל.",image:"צחי לייכט.jpg"},
+ {name:"רועי מחלב",title:"קבלן קוד",desc:"מבחינתו, אינטגרציה של מערכות מורכבות זה בדיוק כמו להרים משקולות כבדות במכון - דורש הרבה כוח, אפס תירוצים ומבט מאיים. כשהקוד מסרב להתחבר כמו שצריך, הוא פשוט מפרק את הכל ומרכיב את התוכנה מחדש בעזרת כוח הזרוע נטו.",image:"רועי מחלב.jpg"},
+ {name:"רפאל לנדמן",title:"צוללן הנתונים",desc:"הוא לקח את המושג 'אגם נתונים' קצת יותר מדי ברצינות, ומסרב באופן עקרוני לכתוב קוד מחוץ למים. אם תבקשו ממנו לשחזר מידע שאבד, הוא פשוט יושיט יד ויגרור אתכם איתו למצולות כדי שתחפשו אותו בעצמכם.",image:"רפאל לנדמן.jpg"},
+ {name:"שחר אטיאס",title:"הצלם השתקן",desc:"הוא יעדיף לפרוץ למצלמות האבטחה של המשרד כדי להשיג את הפריים המושלם, העיקר לא להצטרך לבקש ממישהו לזוז. המבט המבועת הזה שמור אך ורק לרגעים נדירים שבהם מישהו מעז להפריע לו לאכול אבטיח עם שאלות מיותרות על קוד.",image:"שחר אטיאס.jpg"},
+ {name:"שלומי ברסקי",title:"בולם הזעזועים",desc:"החיוך הרגוע הזה הוא מנגנון ההישרדות המושלם מול מנהל צוות שחוטף התקף עצבים מכל התראת שווא במערכת. מבחינתו, גם התקפות סייבר קריטיות וגם הצעקות של הבוס הם פשוט עוד רעשי רקע שהוא יודע לסנן בקלילות דרך ה-SIEM.",image:"שלומי ברסקי.jpg"},
+ {name:"שני מלכא",title:"מנהלת הברזל",desc:"המבט החודר שלה מסוגל לקרוא את קוד המקור של הנשמה שלכם ולזהות תירוצים עוד לפני שבכלל פתחתם את הפה. אל תנסו לבלבל אותה עם באגים דמיוניים או מונחי סייבר מפוצצים, כי היא תעשה לכם דיבאג במוח ותאפס אתכם בשנייה.",image:"שני מלכא.jpg"}
+];
+
+/* deterministic pseudo-random skills per agent */
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const SKILL_NAMES=["HACKING","CAFFEINE","STEALTH","SARCASM","DEBUG-FU","EXCUSES"];
+function skillsFor(name){
+  const h=hash(name);
+  return SKILL_NAMES.map((s,i)=>({label:s,val:55+((h>>(i*4))%46)}));
+}
+
+/* ================= BOOT ================= */
+const bootLines=[
+ ["> CYBER FORCE BIOS v9.11",400],
+ ["> initializing therapy_module.sys ......... ",1100,"OK","ok"],
+ ["> loading 33 agent profiles ............... ",950,"OK","ok"],
+ ["> scanning for excuses ..................... ",950,"404 NOT FOUND","warn"],
+ ["> brewing coffee ........................... ",950,"CRITICAL","warn"],
+ ["> decrypting yearbook ...................... ",1100,"ACCESS GRANTED","ok"],
+ ["",600],
+ ["WELCOME, AGENT.",800]
+];
+const bootEl=document.getElementById('bootlog');
+const boot=document.getElementById('boot');
+let skipBoot=false;
+boot.addEventListener('click',()=>{skipBoot=true;endBoot()});
+function endBoot(){boot.classList.add('done');setTimeout(()=>boot.remove(),700)}
+(async()=>{
+  for(const [txt,delay,status,cls] of bootLines){
+    if(skipBoot)return;
+    await new Promise(r=>setTimeout(r,delay));
+    bootEl.innerHTML+=txt;
+    if(status)bootEl.innerHTML+=`<span class="${cls}">[${status}]</span>`;
+    bootEl.innerHTML+="\n";
+  }
+  bootEl.innerHTML+='<span class="cursor"></span>';
+  await new Promise(r=>setTimeout(r,1200));
+  if(!skipBoot)endBoot();
+})();
+
+/* ================= MATRIX RAIN ================= */
+const cv=document.getElementById('matrix'),ctx=cv.getContext('2d');
+const CHARS="אבגדהוזחטיכלמנסעפצקרשת01<>/{}$#@";
+let cols,drops;
+function sizeCanvas(){
+  cv.width=innerWidth;cv.height=innerHeight;
+  cols=Math.floor(cv.width/18);
+  drops=Array.from({length:cols},()=>Math.random()*-60);
+}
+sizeCanvas();addEventListener('resize',sizeCanvas);
+setInterval(()=>{
+  ctx.fillStyle="rgba(4,7,10,.12)";ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle="#00ff9c";ctx.font="14px monospace";
+  drops.forEach((y,i)=>{
+    ctx.fillText(CHARS[Math.random()*CHARS.length|0],i*18,y*18);
+    drops[i]=y*18>cv.height&&Math.random()>.975?0:y+1;
+  });
+},66);
+
+/* ================= STATS COUNTERS ================= */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const el=e.target,target=+el.dataset.count;io.unobserve(el);
+  const t0=performance.now(),dur=1400;
+  (function tick(t){
+    const p=Math.min((t-t0)/dur,1),ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(target*ease).toLocaleString();
+    if(p<1)requestAnimationFrame(tick);
+  })(t0);
+}),{threshold:.4});
+document.querySelectorAll('.num').forEach(el=>io.observe(el));
+
+/* ================= GRID ================= */
+const grid=document.getElementById('grid');
+const countEl=document.getElementById('count');
+let order=AGENTS.map((_,i)=>i);
+
+function render(){
+  const q=document.getElementById('search').value.trim();
+  grid.innerHTML="";
+  let shown=0;
+  order.forEach((idx,pos)=>{
+    const a=AGENTS[idx];
+    if(q&&!(a.name.includes(q)||a.title.includes(q)))return;
+    shown++;
+    const card=document.createElement('article');
+    card.className='card';
+    card.style.setProperty('--i',Math.min(pos,20));
+    card.innerHTML=`
+      <span class="cb1"></span><span class="cb2"></span>
+      <div class="photo">
+        <span class="badge-id">AGT-${String(idx+1).padStart(3,'0')}</span>
+        <span class="badge-clr">TOP&nbsp;SECRET</span>
+        <img loading="lazy" src="${a.image}" alt="${a.name}">
+        <span class="scan"></span>
+      </div>
+      <div class="meta">
+        <div class="codename">${a.title}</div>
+        <div class="name">${a.name}</div>
+        <p class="desc">${a.desc}</p>
+        <div class="open-hint">&gt; CLICK TO DECRYPT_</div>
+      </div>`;
+    card.addEventListener('click',()=>openDossier(idx));
+    grid.appendChild(card);
+  });
+  if(!shown)grid.innerHTML='<div class="noresults">ERROR 404 — AGENT NOT FOUND. נסו שם אחר.</div>';
+  countEl.textContent=`[ ${shown}/${AGENTS.length} agents ]`;
+}
+document.getElementById('search').addEventListener('input',render);
+document.getElementById('shuffle').addEventListener('click',()=>{
+  for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]]}
+  render();
+});
+render();
+
+/* ================= DOSSIER ================= */
+const overlay=document.getElementById('overlay');
+let current=0;
+function openDossier(idx){
+  current=idx;const a=AGENTS[idx];
+  document.getElementById('d-img').src=a.image;
+  document.getElementById('d-img').alt=a.name;
+  document.getElementById('d-id').textContent=`FILE #AGT-${String(idx+1).padStart(3,'0')} // CLEARANCE LEVEL-9`;
+  document.getElementById('d-name').textContent=a.name;
+  document.getElementById('d-code').textContent=a.title;
+  document.getElementById('d-desc').textContent=a.desc;
+  const sk=document.getElementById('d-skills');
+  sk.innerHTML=skillsFor(a.name).map(s=>`
+    <div class="skill">
+      <span class="sl">${s.label}</span>
+      <span class="bar"><span class="fill" data-w="${s.val}"></span></span>
+      <span class="sv">${s.val}%</span>
+    </div>`).join('');
+  overlay.classList.add('open');
+  document.body.style.overflow='hidden';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    sk.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%');
+  }));
+}
+function closeDossier(){overlay.classList.remove('open');document.body.style.overflow=''}
+document.getElementById('close').addEventListener('click',closeDossier);
+overlay.addEventListener('click',e=>{if(e.target===overlay)closeDossier()});
+document.getElementById('prev').addEventListener('click',()=>openDossier((current-1+AGENTS.length)%AGENTS.length));
+document.getElementById('next').addEventListener('click',()=>openDossier((current+1)%AGENTS.length));
+addEventListener('keydown',e=>{
+  if(!overlay.classList.contains('open'))return;
+  if(e.key==='Escape')closeDossier();
+  if(e.key==='ArrowLeft')openDossier((current+1)%AGENTS.length);
+  if(e.key==='ArrowRight')openDossier((current-1+AGENTS.length)%AGENTS.length);
+});
+</script>
+</body>
+</html>
